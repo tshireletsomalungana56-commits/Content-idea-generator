@@ -353,7 +353,7 @@ Search for what is trending RIGHT NOW in these spaces. Then generate exactly 3 s
 
 Return ONLY a valid JSON array of 3 objects with keys: niche (accounting_study/corporate_life/personal_lifestyle), purpose (direct/growth/soft), hook (under 12 words), hook2, hook3, talking (2-3 sentences specific), shoot (how to film), cta (exact ending), trending (one trending topic RIGHT NOW), effort (quick/medium). Raw JSON only, no markdown.`;
 
-  const res = await fetch('/api/anthropic', {
+  const res = await fetch('/.netlify/functions/anthropic', {
     method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, tools:[{type:'web_search_20250305',name:'web_search'}], messages:[{role:'user',content:prompt}] }),
   });
@@ -386,7 +386,7 @@ Return a JSON object with:
 Raw JSON only, no markdown.`;
 
   try {
-    const res = await fetch('/api/anthropic', {
+    const res = await fetch('/.netlify/functions/anthropic', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, messages:[{role:'user',content:prompt}] }),
     });
