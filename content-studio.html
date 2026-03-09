@@ -8,869 +8,609 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --gold: #B8924A;
-      --gold-light: #F0C070;
-      --navy: #080f1c;
-      --navy-mid: #0d1524;
-      --navy-card: #161f32;
-      --slate: #94A3B8;
-      --body: #CBD5E1;
-      --muted: #475569;
-      --dim: #374151;
+      --gold: #B8924A; --gold-light: #F0C070;
+      --navy: #080f1c; --navy-card: #161f32; --navy-mid: #0d1524;
+      --slate: #94A3B8; --body: #CBD5E1; --muted: #475569; --dim: #374151;
     }
-
     html { scroll-behavior: smooth; }
-
     body {
       min-height: 100vh;
       background: radial-gradient(ellipse 90% 60% at 50% -5%, #1a2e50 0%, #080f1c 55%);
       font-family: 'DM Sans', sans-serif;
       color: #F1F5F9;
-      padding: 40px 18px 80px;
+      padding-bottom: 80px;
     }
-
-    /* Grain overlay */
     body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.3;
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.3;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
     }
+    .wrap { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 0 18px; }
 
-    .wrap {
-      position: relative;
-      z-index: 1;
-      max-width: 740px;
-      margin: 0 auto;
+    /* NAV */
+    .sticky-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8,15,28,0.93); backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
     }
+    .top-nav { display: flex; gap: 0; max-width: 760px; margin: 0 auto; padding: 0 18px; }
+    .nav-tab {
+      padding: 16px 22px; font-size: 13px; font-weight: 600;
+      font-family: 'DM Sans', sans-serif; color: var(--muted);
+      border: none; background: none; cursor: pointer;
+      border-bottom: 2px solid transparent; transition: all 0.2s;
+      display: flex; align-items: center; gap: 7px; white-space: nowrap;
+    }
+    .nav-tab:hover { color: var(--slate); }
+    .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+    .saved-count {
+      background: rgba(184,146,74,0.2); color: var(--gold);
+      font-size: 10px; font-weight: 700; font-family: 'DM Mono', monospace;
+      padding: 2px 7px; border-radius: 100px;
+    }
+
+    /* PAGES */
+    .page { display: none; }
+    .page.active { display: block; }
 
     /* HEADER */
-    .header { text-align: center; margin-bottom: 42px; }
-
+    .header { text-align: center; margin-bottom: 32px; padding-top: 32px; }
     .pill {
-      display: inline-flex;
-      align-items: center;
-      background: rgba(184,146,74,0.1);
-      border: 1px solid rgba(184,146,74,0.28);
-      border-radius: 100px;
-      padding: 5px 18px;
-      margin-bottom: 18px;
-      color: var(--gold);
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
+      display: inline-flex; align-items: center;
+      background: rgba(184,146,74,0.1); border: 1px solid rgba(184,146,74,0.28);
+      border-radius: 100px; padding: 5px 18px; margin-bottom: 16px;
+      color: var(--gold); font-family: 'DM Mono', monospace;
+      font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
     }
-
     h1 {
-      font-family: 'Playfair Display', serif;
-      font-weight: 900;
-      font-size: clamp(28px, 6vw, 44px);
-      line-height: 1.1;
-      margin-bottom: 12px;
+      font-family: 'Playfair Display', serif; font-weight: 900;
+      font-size: clamp(26px, 5vw, 40px); line-height: 1.1; margin-bottom: 10px;
       background: linear-gradient(135deg, #F1F5F9 0%, #94A3B8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
-
-    .subtitle {
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.6;
-      max-width: 460px;
-      margin: 0 auto;
-    }
+    .subtitle { color: var(--muted); font-size: 14px; line-height: 1.6; max-width: 440px; margin: 0 auto; }
 
     /* CONTROLS */
     .controls {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 18px;
-      padding: 22px 24px;
-      margin-bottom: 22px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 18px; padding: 22px 24px; margin-bottom: 20px;
     }
-
     .control-label {
-      color: var(--dim);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      font-family: 'DM Mono', monospace;
-      margin-bottom: 10px;
+      color: var(--dim); font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; font-family: 'DM Mono', monospace; margin-bottom: 10px;
     }
-
-    .btn-group { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 0; }
     .control-spacer { margin-bottom: 20px; }
-
+    .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
     .toggle-btn {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 10px;
-      padding: 8px 20px;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: 'DM Sans', sans-serif;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px; padding: 8px 18px; color: var(--muted);
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+      font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 6px;
     }
-
-    .toggle-btn.active-gold {
-      background: rgba(184,146,74,0.18);
-      border-color: var(--gold);
-      color: var(--gold);
-    }
-
-    .toggle-btn.active-blue {
-      background: rgba(96,165,250,0.15);
-      border-color: #60A5FA;
-      color: #60A5FA;
-    }
-
+    .toggle-btn.active-gold { background: rgba(184,146,74,0.18); border-color: var(--gold); color: var(--gold); }
+    .toggle-btn.active-blue { background: rgba(96,165,250,0.15); border-color: #60A5FA; color: #60A5FA; }
     .mode-btn {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 10px;
-      padding: 10px 20px;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: left;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px; padding: 10px 18px; cursor: pointer; transition: all 0.2s; text-align: left;
     }
-
     .mode-btn .mode-title { font-size: 13px; font-weight: 700; color: var(--muted); font-family: 'DM Sans', sans-serif; }
-    .mode-btn .mode-sub   { font-size: 11px; color: #334155; margin-top: 3px; font-family: 'DM Mono', monospace; }
-
+    .mode-btn .mode-sub { font-size: 11px; color: #334155; margin-top: 3px; font-family: 'DM Mono', monospace; }
     .mode-btn.active-blue { background: rgba(96,165,250,0.15); border-color: #60A5FA; }
     .mode-btn.active-blue .mode-title { color: #60A5FA; }
 
-    /* GENERATE BUTTON */
+    /* GEN BUTTON */
     #gen-btn {
-      width: 100%;
-      padding: 20px;
+      width: 100%; padding: 20px;
       background: linear-gradient(135deg, #B8924A 0%, #F0C070 50%, #B8924A 100%);
-      background-size: 200%;
-      border: none;
-      border-radius: 14px;
-      color: #0F172A;
-      font-size: 16px;
-      font-weight: 800;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      letter-spacing: 0.3px;
-      margin-bottom: 32px;
-      box-shadow: 0 8px 40px rgba(184,146,74,0.28);
-      transition: all 0.25s;
+      border: none; border-radius: 14px; color: #0F172A;
+      font-size: 16px; font-weight: 800; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; margin-bottom: 28px;
+      box-shadow: 0 8px 40px rgba(184,146,74,0.28); transition: all 0.25s;
     }
+    #gen-btn:disabled { background: rgba(184,146,74,0.15); color: var(--gold); cursor: not-allowed; box-shadow: none; }
+    #gen-btn:not(:disabled):hover { transform: scale(1.01); box-shadow: 0 12px 48px rgba(184,146,74,0.38); }
 
-    #gen-btn:disabled {
-      background: rgba(184,146,74,0.15);
-      color: var(--gold);
-      cursor: not-allowed;
-      box-shadow: none;
-      transform: scale(0.99);
-    }
-
-    #gen-btn:not(:disabled):hover {
-      transform: scale(1.01);
-      box-shadow: 0 12px 48px rgba(184,146,74,0.38);
-    }
-
-    /* ERROR */
     .error-box {
-      background: rgba(239,68,68,0.1);
-      border: 1px solid rgba(239,68,68,0.3);
-      border-radius: 12px;
-      padding: 14px 18px;
-      margin-bottom: 24px;
-      color: #FCA5A5;
-      font-size: 14px;
-      display: none;
+      background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 12px; padding: 14px 18px; margin-bottom: 20px;
+      color: #FCA5A5; font-size: 14px; display: none;
     }
 
     /* DIVIDER */
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 22px;
-      opacity: 0;
-      transition: opacity 0.4s;
-    }
-
+    .divider { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; opacity: 0; transition: opacity 0.4s; }
     .divider.show { opacity: 1; }
     .divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.05); }
-    .divider-text {
-      color: #1E293B;
-      font-size: 11px;
-      font-family: 'DM Mono', monospace;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
+    .divider-text { color: #1E293B; font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; white-space: nowrap; }
 
     /* IDEA CARD */
     .idea-card {
-      opacity: 0;
-      transform: translateY(28px);
+      opacity: 0; transform: translateY(28px);
       transition: opacity 0.55s ease, transform 0.55s ease;
       background: linear-gradient(145deg, #161f32 0%, #0d1524 100%);
       border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 18px;
-      padding: 26px;
-      margin-bottom: 18px;
-      position: relative;
-      overflow: hidden;
+      border-radius: 18px; padding: 24px; margin-bottom: 16px;
+      position: relative; overflow: hidden;
     }
-
     .idea-card.visible { opacity: 1; transform: translateY(0); }
-    .idea-card::before {
-      content: '';
-      position: absolute;
-      top: 0; right: 0;
-      width: 160px; height: 160px;
-      pointer-events: none;
-    }
+    .card-glow { position: absolute; top: 0; right: 0; width: 160px; height: 160px; pointer-events: none; }
 
-    /* Badges */
-    .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-    .badge {
-      border-radius: 8px;
-      padding: 4px 12px;
-      font-size: 11px;
-      font-family: 'DM Mono', monospace;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-      border: 1px solid transparent;
+    .card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+    .badges { display: flex; flex-wrap: wrap; gap: 7px; }
+    .badge { border-radius: 8px; padding: 4px 11px; font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 700; border: 1px solid transparent; }
+    .card-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .action-btn {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 9px; padding: 7px 13px; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+      white-space: nowrap; display: flex; align-items: center; gap: 5px;
     }
+    .save-btn { color: #94A3B8; }
+    .save-btn:hover { background: rgba(184,146,74,0.15); border-color: var(--gold); color: var(--gold); }
+    .save-btn.saved { background: rgba(184,146,74,0.2); border-color: var(--gold); color: var(--gold); }
+    .expand-btn { color: #94A3B8; }
+    .expand-btn:hover { background: rgba(96,165,250,0.15); border-color: #60A5FA; color: #60A5FA; }
+    .expand-btn.open { background: rgba(96,165,250,0.15); border-color: #60A5FA; color: #60A5FA; }
 
-    .purpose-desc {
-      color: #475569;
-      font-size: 11px;
-      font-family: 'DM Mono', monospace;
-      font-style: italic;
-      margin-bottom: 18px;
-    }
+    .purpose-desc { color: #475569; font-size: 11px; font-family: 'DM Mono', monospace; font-style: italic; margin-bottom: 16px; }
+    .sec-label { color: var(--dim); font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-family: 'DM Mono', monospace; margin-bottom: 9px; }
 
-    /* Section label */
-    .sec-label {
-      color: var(--dim);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      font-family: 'DM Mono', monospace;
-      margin-bottom: 10px;
-    }
-
-    /* Hook box */
-    .hook-box {
-      background: rgba(245,158,11,0.06);
-      border: 1px solid rgba(245,158,11,0.2);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 20px;
-    }
-
-    .hook-text {
-      color: #F1F5F9;
-      font-size: 18px;
-      font-weight: 800;
-      font-family: 'Playfair Display', serif;
-      line-height: 1.35;
-      margin-bottom: 14px;
-    }
-
+    .hook-box { background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2); border-radius: 12px; padding: 14px; margin-bottom: 18px; }
+    .hook-text { color: #F1F5F9; font-size: 17px; font-weight: 800; font-family: 'Playfair Display', serif; line-height: 1.35; margin-bottom: 12px; }
     .hook-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
-    .hook-tab {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 6px;
-      padding: 3px 12px;
-      color: #475569;
-      font-size: 11px;
-      cursor: pointer;
-      font-family: 'DM Mono', monospace;
-      transition: all 0.2s;
-    }
+    .hook-tab { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 3px 11px; color: #475569; font-size: 11px; cursor: pointer; font-family: 'DM Mono', monospace; transition: all 0.2s; }
+    .hook-tab.active { background: rgba(245,158,11,0.22); border-color: #F59E0B; color: #F59E0B; }
 
-    .hook-tab.active {
-      background: rgba(245,158,11,0.22);
-      border-color: #F59E0B;
-      color: #F59E0B;
-    }
-
-    /* Two col grid */
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
     @media (max-width: 520px) { .two-col { grid-template-columns: 1fr; } }
+    .info-box { background: rgba(255,255,255,0.025); border-radius: 10px; padding: 12px; color: var(--slate); font-size: 13px; line-height: 1.65; }
 
-    .info-box {
-      background: rgba(255,255,255,0.025);
-      border-radius: 10px;
-      padding: 12px;
-      color: var(--slate);
-      font-size: 13px;
-      line-height: 1.65;
-    }
-
-    /* Trending */
-    .trending-row {
-      background: rgba(96,165,250,0.07);
-      border: 1px solid rgba(96,165,250,0.15);
-      border-radius: 10px;
-      padding: 10px 14px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .trending-label {
-      color: #60A5FA;
-      font-size: 11px;
-      font-family: 'DM Mono', monospace;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
+    .trending-row { background: rgba(96,165,250,0.07); border: 1px solid rgba(96,165,250,0.15); border-radius: 10px; padding: 10px 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .trending-label { color: #60A5FA; font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 700; white-space: nowrap; }
     .trending-value { color: #93C5FD; font-size: 13px; }
 
-    /* Platform tip */
-    .platform-row {
-      background: rgba(192,132,252,0.06);
-      border: 1px solid rgba(192,132,252,0.15);
-      border-radius: 10px;
-      padding: 10px 14px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-    }
-
-    .platform-label {
-      color: #C084FC;
-      font-size: 11px;
-      font-family: 'DM Mono', monospace;
-      font-weight: 700;
-      white-space: nowrap;
-      padding-top: 1px;
-    }
-
+    .platform-row { background: rgba(192,132,252,0.06); border: 1px solid rgba(192,132,252,0.15); border-radius: 10px; padding: 10px 14px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 8px; }
+    .platform-label { color: #C084FC; font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 700; white-space: nowrap; padding-top: 1px; }
     .platform-value { color: #D8B4FE; font-size: 13px; line-height: 1.5; }
 
-    /* CTA row */
-    .cta-row {
-      border-left: 3px solid var(--gold);
-      background: rgba(184,146,74,0.06);
-      border-radius: 0 10px 10px 0;
-      padding: 12px 14px;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-    }
-
-    .cta-label {
-      color: var(--gold);
-      font-size: 10px;
-      font-weight: 700;
-      font-family: 'DM Mono', monospace;
-      white-space: nowrap;
-      padding-top: 2px;
-      letter-spacing: 1px;
-    }
-
+    .cta-row { border-left: 3px solid var(--gold); background: rgba(184,146,74,0.06); border-radius: 0 10px 10px 0; padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; }
+    .cta-label { color: var(--gold); font-size: 10px; font-weight: 700; font-family: 'DM Mono', monospace; white-space: nowrap; padding-top: 2px; letter-spacing: 1px; }
     .cta-value { color: #FCD34D; font-size: 14px; font-style: italic; line-height: 1.5; }
 
-    /* Footer */
-    .footer-note {
-      text-align: center;
-      color: #1E293B;
-      font-size: 12px;
-      font-family: 'DM Mono', monospace;
-      margin-top: 8px;
-      opacity: 0;
-      transition: opacity 0.5s ease 0.6s;
-    }
+    /* SCRIPT PANEL */
+    .script-panel { display: none; margin-top: 14px; background: rgba(96,165,250,0.04); border: 1px solid rgba(96,165,250,0.15); border-radius: 14px; padding: 20px; }
+    .script-panel.open { display: block; }
+    .script-loading { text-align: center; padding: 28px; color: #60A5FA; font-size: 14px; font-family: 'DM Mono', monospace; }
+    .script-section { margin-bottom: 18px; }
+    .script-section-title { color: #60A5FA; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-family: 'DM Mono', monospace; margin-bottom: 8px; }
+    .script-content { background: rgba(255,255,255,0.03); border-radius: 10px; padding: 14px; color: #CBD5E1; font-size: 14px; line-height: 1.75; white-space: pre-wrap; }
+    .shot-list { list-style: none; }
+    .shot-item { display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start; }
+    .shot-num { background: rgba(96,165,250,0.2); color: #60A5FA; font-size: 11px; font-weight: 700; font-family: 'DM Mono', monospace; padding: 3px 9px; border-radius: 6px; white-space: nowrap; flex-shrink: 0; }
+    .shot-text { color: #94A3B8; font-size: 13px; line-height: 1.6; }
 
+    /* SAVED PAGE */
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-icon { font-size: 40px; margin-bottom: 14px; }
+    .empty-title { color: #F1F5F9; font-size: 18px; font-weight: 700; font-family: 'Playfair Display', serif; margin-bottom: 8px; }
+    .empty-sub { color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+    .footer-note { text-align: center; color: #1E293B; font-size: 12px; font-family: 'DM Mono', monospace; margin-top: 6px; opacity: 0; transition: opacity 0.5s ease 0.6s; padding-bottom: 20px; }
     .footer-note.show { opacity: 1; }
   </style>
 </head>
 <body>
+
+<div class="sticky-nav">
+  <div class="top-nav">
+    <button class="nav-tab active" id="tab-generate" onclick="switchTab('generate',this)">✦ Generate</button>
+    <button class="nav-tab" id="tab-saved" onclick="switchTab('saved',this)">
+      ♡ Saved <span class="saved-count" id="saved-count" style="display:none">0</span>
+    </button>
+  </div>
+</div>
+
 <div class="wrap">
 
-  <!-- Header -->
-  <div class="header">
-    <div class="pill">AccSciHQ ✦ Content Studio</div>
-    <h1>What are you filming today?</h1>
-    <p class="subtitle">3 ideas per session — one AccSciHQ push, one growth post, one soft conversion. Every time.</p>
-  </div>
+  <!-- GENERATE -->
+  <div class="page active" id="page-generate">
+    <div class="header">
+      <div class="pill">AccSciHQ ✦ Content Studio</div>
+      <h1>What are you filming today?</h1>
+      <p class="subtitle">3 ideas per session — one AccSciHQ push, one growth post, one soft conversion.</p>
+    </div>
 
-  <!-- Controls -->
-  <div class="controls">
-    <!-- Platform -->
-    <div class="control-spacer">
-      <div class="control-label">Platform</div>
-      <div class="btn-group">
-        <button class="toggle-btn active-gold" data-group="platform" data-val="tiktok">🎵 TikTok</button>
-        <button class="toggle-btn" data-group="platform" data-val="reels">📸 Reels</button>
-        <button class="toggle-btn" data-group="platform" data-val="both">✦ Both</button>
+    <div class="controls">
+      <div class="control-spacer">
+        <div class="control-label">Platform</div>
+        <div class="btn-group">
+          <button class="toggle-btn active-gold" data-group="platform" data-val="tiktok">🎵 TikTok</button>
+          <button class="toggle-btn" data-group="platform" data-val="reels">📸 Reels</button>
+          <button class="toggle-btn" data-group="platform" data-val="both">✦ Both</button>
+        </div>
+      </div>
+      <div>
+        <div class="control-label">Mode</div>
+        <div class="btn-group">
+          <button class="mode-btn active-blue" data-group="mode" data-val="quick">
+            <div class="mode-title">⚡ Quick</div>
+            <div class="mode-sub">Instant — smart library</div>
+          </button>
+          <button class="mode-btn" data-group="mode" data-val="deep">
+            <div class="mode-title">🔍 Deep Research</div>
+            <div class="mode-sub">Live trends — 10–15 sec</div>
+          </button>
+        </div>
       </div>
     </div>
-    <!-- Mode -->
-    <div>
-      <div class="control-label">Mode</div>
-      <div class="btn-group">
-        <button class="mode-btn active-blue" data-group="mode" data-val="quick">
-          <div class="mode-title">⚡ Quick</div>
-          <div class="mode-sub">Instant — smart library</div>
-        </button>
-        <button class="mode-btn" data-group="mode" data-val="deep">
-          <div class="mode-title">🔍 Deep Research</div>
-          <div class="mode-sub">Live trends — 10–15 sec</div>
-        </button>
-      </div>
-    </div>
+
+    <button id="gen-btn">✦ Generate my 3 ideas</button>
+    <div class="error-box" id="error-box"></div>
+    <div id="output"></div>
   </div>
 
-  <!-- Generate button -->
-  <button id="gen-btn">✦ Generate my 3 ideas</button>
-
-  <!-- Error -->
-  <div class="error-box" id="error-box"></div>
-
-  <!-- Output -->
-  <div id="output"></div>
+  <!-- SAVED -->
+  <div class="page" id="page-saved">
+    <div class="header">
+      <h1>Saved Ideas</h1>
+      <p class="subtitle">Your content backlog. Expand any saved idea into a full script when you're ready to film.</p>
+    </div>
+    <div id="saved-output"></div>
+  </div>
 
 </div>
 
 <script>
-// ─── STATE ────────────────────────────────────────────────────────────────────
+// ── STATE ─────────────────────────────────────────────────────────────────────
 let platform = 'tiktok';
-let mode     = 'quick';
+let mode = 'quick';
+let savedIdeas = JSON.parse(localStorage.getItem('accscihq_saved') || '[]');
+let currentIdeas = [];
 
-// ─── CONTENT LIBRARY ─────────────────────────────────────────────────────────
-const POOL_ACCSCIHQ = [
-  {
-    niche:'accounting_study',
-    hooks:["I built a whole app because I couldn't track my CTA marks properly","The tool I wish existed when I was failing my hardest accounting module","How 14 accounting students are using this to prep for exams right now"],
-    talking:"Show the AccSciHQ tracker on your phone — log a topic, add a confidence level, generate the cheat sheet. Make it feel like a friend demo, not an ad. Be genuine about why you built it.",
-    shoot:"Screen recording of the app overlaid on your face cam. Sitting at a desk, casual. Talk while you tap through the app. Raw and unedited feels more credible here.",
-    cta:"Free 7-day trial, no card needed — link in bio ✦",
-    purpose:'direct', effort:'quick',
-  },
-  {
-    niche:'corporate_life',
-    hooks:["Running a business while doing articles — what my actual week looks like","Nobody told me you could build something real while working full time","Day in my life: audit trainee by day, EdTech founder by night"],
-    talking:"Walk a real day — firm in the morning, building AccSciHQ in the evenings. Don't glamourise it. The juggle IS the content. Mention AccSciHQ naturally as the thing you're building on the side.",
-    shoot:"Vlog style — mix of clips throughout the day. Morning commute, office, evening desk. Voiceover in transitions. iPhone quality is perfect, don't overthink the setup.",
-    cta:"Follow to see how this plays out — building in public this year ✦",
-    purpose:'direct', effort:'medium',
-  },
-  {
-    niche:'personal_lifestyle',
-    hooks:["The real reason I started AccSciHQ — and it wasn't money","I saw a problem nobody was solving. So I built the solution.","What starting a business at 23 actually taught me"],
-    talking:"Tell the founding story authentically. The gap you saw, what you built, what surprised you. This is the post that makes people feel like they know you. Keep it personal, not polished.",
-    shoot:"Sitting on your bed or couch, phone propped up, no desk setup. Talking to camera like you're telling a friend a story. Natural light, no ring light. Intimacy is the whole vibe.",
-    cta:"AccSciHQ is live — link in bio to see what we built ✦",
-    purpose:'direct', effort:'medium',
-  },
-  {
-    niche:'accounting_study',
-    hooks:["The cheat sheet I used to survive my hardest accounting exam","What if you could generate your entire exam review in 30 seconds","This is why I log my exam triggers after every single lecture"],
-    talking:"Explain exam triggers — how logging what an examiner is likely to test per topic builds a personalised cheat sheet over the semester. Show the output. Make it look like the most useful thing they've never heard of.",
-    shoot:"Split screen — you talking on one side, app screen recording on the other. Portrait format. Quick cuts. Energy slightly higher than usual.",
-    cta:"Built into the AccSciHQ tracker — free trial, link in bio ✦",
-    purpose:'direct', effort:'quick',
-  },
-  {
-    niche:'corporate_life',
-    hooks:["945 students on a list and a full-time job — here's how I manage both","The moment AccSciHQ started feeling like a real business","Building something people actually pay for while doing articles"],
-    talking:"Show the reality of running AccSciHQ as a side business while in articles — approving students, answering tutor queries, building guides. This is the behind-the-scenes content that makes people root for you.",
-    shoot:"Phone propped on your desk in the evening. Showing your screen, talking to camera. Authentic, slightly tired energy — that's the real version of this.",
-    cta:"Follow along — documenting the whole build this year ✦",
-    purpose:'direct', effort:'quick',
-  },
+// ── CONTENT LIBRARY ───────────────────────────────────────────────────────────
+const POOL_DIRECT = [
+  { niche:'accounting_study', hooks:["I built a whole app because I couldn't track my CTA marks properly","The tool I wish existed when I was failing my hardest accounting module","How 14 accounting students are using this to prep for exams right now"], talking:"Show the AccSciHQ tracker on your phone — log a topic, add a confidence level, generate the cheat sheet. Make it feel like a friend demo, not an ad. Be genuine about why you built it.", shoot:"Screen recording of the app overlaid on your face cam. Sitting at a desk, casual. Talk while you tap through the app. Raw and unedited feels more credible here.", cta:"Free 7-day trial, no card needed — link in bio ✦", purpose:'direct', effort:'quick' },
+  { niche:'corporate_life', hooks:["Running a business while doing articles — what my actual week looks like","Nobody told me you could build something real while working full time","Day in my life: audit trainee by day, EdTech founder by night"], talking:"Walk a real day — firm in the morning, building AccSciHQ in the evenings. Don't glamourise it. The juggle IS the content. Mention AccSciHQ naturally as the thing you're building on the side.", shoot:"Vlog style — mix of clips throughout the day. Morning commute, office, evening desk. Voiceover in transitions. iPhone quality is perfect, don't overthink the setup.", cta:"Follow to see how this plays out — building in public this year ✦", purpose:'direct', effort:'medium' },
+  { niche:'personal_lifestyle', hooks:["The real reason I started AccSciHQ — and it wasn't money","I saw a problem nobody was solving. So I built the solution.","What starting a business at 23 actually taught me"], talking:"Tell the founding story authentically. The gap you saw, what you built, what surprised you. This is the post that makes people feel like they know you. Keep it personal, not polished.", shoot:"Sitting on your bed or couch, phone propped up, no desk setup. Talking to camera like you're telling a friend a story. Natural light, no ring light. Intimacy is the whole vibe.", cta:"AccSciHQ is live — link in bio to see what we built ✦", purpose:'direct', effort:'medium' },
+  { niche:'accounting_study', hooks:["The cheat sheet I used to survive my hardest accounting exam","What if you could generate your entire exam review in 30 seconds","This is why I log my exam triggers after every single lecture"], talking:"Explain exam triggers — how logging what an examiner is likely to test per topic builds a personalised cheat sheet over the semester. Show the output. Make it look like the most useful thing they've never heard of.", shoot:"Split screen — you talking on one side, app screen recording on the other. Portrait format. Quick cuts. Energy slightly higher than usual.", cta:"Built into the AccSciHQ tracker — free trial, link in bio ✦", purpose:'direct', effort:'quick' },
+  { niche:'corporate_life', hooks:["945 students on a list and a full-time job — here's how I manage both","The moment AccSciHQ started feeling like a real business","Building something people actually pay for while doing articles"], talking:"Show the reality of running AccSciHQ as a side business while in articles — approving students, answering tutor queries, building guides. This is the behind-the-scenes content that makes people root for you.", shoot:"Phone propped on your desk in the evening. Showing your screen, talking to camera. Authentic, slightly tired energy — that's the real version of this.", cta:"Follow along — documenting the whole build this year ✦", purpose:'direct', effort:'quick' },
 ];
 
 const POOL_GROWTH = [
-  {
-    niche:'accounting_study',
-    hooks:["Every accounting student needs to hear this before their next exam","3 marks you're leaving on the table in every accounting question","The thing your lecturer won't tell you about passing accounting"],
-    talking:"Walk through 3 most common free marks in financial management or accounting questions — control premium adjustment, tax rate application, stating your assumption. Specific, practical, immediately useful.",
-    shoot:"Seated, camera close, eye level. Calm and direct — like a tutor who's about to save your marks. Write the 3 points on a sticky note or whiteboard as you go.",
-    cta:"Save this and use it in your next exam ✦",
-    purpose:'growth', effort:'quick',
-  },
-  {
-    niche:'accounting_study',
-    hooks:["Nobody talks about how hard the jump from BCom to Honours actually is","The BCom to CTA gap is real — here's how to actually survive it","Things I wish someone told me before starting Honours"],
-    talking:"Be honest about the academic difficulty jump — less memorisation, more application. Questions don't tell you what method to use. Time pressure is brutal. But here's what actually helps: structured thinking, not more notes.",
-    shoot:"Walking outside or sitting in a coffee shop. Casual, conversational. Talking to a friend, not giving a lecture. Let it breathe.",
-    cta:"Follow for honest CTA and Honours content all year ✦",
-    purpose:'growth', effort:'quick',
-  },
-  {
-    niche:'accounting_study',
-    hooks:["First year accounting students — this will save you so much time","The study system no BCom lecturer actually teaches you","Stop highlighting everything. Do this instead."],
-    talking:"Active vs passive studying for accounting — the trap of re-reading notes vs doing questions under time pressure. Relevant to all accounting levels not just CTA. Broad reach potential.",
-    shoot:"Standing, talking straight to camera. Energetic, short punchy points. Text overlays reinforce each point. Under 45 seconds.",
-    cta:"Follow for more — posting accounting study tips all year ✦",
-    purpose:'growth', effort:'quick',
-  },
-  {
-    niche:'corporate_life',
-    hooks:["Things nobody tells you before your first corporate job","The unwritten rules of office life they don't teach at university","Year one in corporate — what genuinely surprised me"],
-    talking:"Pick 3 real unwritten rules — reading the room in meetings, how to email senior people, the difference between being busy and being visible. Specific and honest. This content travels far.",
-    shoot:"Walking outside or down a corridor. Talking straight to camera, no cuts. Voice note energy — like you just thought of something and hit record. Movement adds energy.",
-    cta:"Follow if you're navigating corporate life right now ✦",
-    purpose:'growth', effort:'quick',
-  },
-  {
-    niche:'corporate_life',
-    hooks:["Hot take: your degree didn't actually prepare you for corporate life","The skills that matter in your first job — hint, not the ones you studied","What a 4-year degree doesn't teach you about working with people"],
-    talking:"Emotional intelligence, managing up, reading a brief properly, knowing when to ask vs figure it out. Skills that separate people who progress from those who plateau. Be direct and slightly provocative.",
-    shoot:"Seated, direct to camera, confident energy. Opinion piece — own it. No notes, no script. Short and punchy, under 45 seconds.",
-    cta:"Agree or disagree? Drop it in the comments ✦",
-    purpose:'growth', effort:'quick',
-  },
-  {
-    niche:'corporate_life',
-    hooks:["The salary conversation nobody in corporate wants to have out loud","How to negotiate when you feel like you have zero leverage","What I learnt about asking for money early in my career"],
-    talking:"Mindset shift — you're not asking for a favour, you're negotiating a business arrangement. Know your market rate, time it right, have a number ready. Practical and specific, not generic career advice.",
-    shoot:"Sitting at a desk, professional but relaxed. Feels like advice from someone slightly ahead of you. Natural light, confident.",
-    cta:"Save this for your next performance review ✦",
-    purpose:'growth', effort:'medium',
-  },
-  {
-    niche:'personal_lifestyle',
-    hooks:["Unpopular opinion: work-life balance is a myth. Here's what to actually chase.","I stopped trying to balance everything — and this happened","The season of life nobody talks about honestly"],
-    talking:"Reframe balance as integration — some seasons are heavy on work, some on life. The goal isn't an equal split, it's knowing which season you're in and owning it without guilt.",
-    shoot:"Walking outside in the evening or on a weekend. Loose, unscripted, genuine. Voice note energy — like you just thought of this and hit record immediately.",
-    cta:"Follow for honest takes on building a career and a life at the same time ✦",
-    purpose:'growth', effort:'quick',
-  },
-  {
-    niche:'personal_lifestyle',
-    hooks:["POV: 23, employed, building a business and writing board exams simultaneously","Nobody prepared me for doing everything at once and I wouldn't change it","The era of doing too much — an honest reflection"],
-    talking:"Honest, specific, relatable. What this season actually feels like — the chaos, the wins, the exhaustion, the excitement. Don't make it a highlight reel. The messiness is what people connect with.",
-    shoot:"Vlog snippets stitched — morning routine, commute, desk, evening. Text overlays tell the story. 30–45 seconds max. Aesthetic but not over-produced.",
-    cta:"Follow along — documenting the whole journey this year ✦",
-    purpose:'growth', effort:'quick',
-  },
+  { niche:'accounting_study', hooks:["Every accounting student needs to hear this before their next exam","3 marks you're leaving on the table in every accounting question","The thing your lecturer won't tell you about passing accounting"], talking:"Walk through 3 most common free marks in financial management or accounting questions — control premium adjustment, tax rate application, stating your assumption. Specific, practical, immediately useful.", shoot:"Seated, camera close, eye level. Calm and direct — like a tutor who's about to save your marks. Write the 3 points on a sticky note or whiteboard as you go.", cta:"Save this and use it in your next exam ✦", purpose:'growth', effort:'quick' },
+  { niche:'accounting_study', hooks:["Nobody talks about how hard the jump from BCom to Honours actually is","The BCom to CTA gap is real — here's how to actually survive it","Things I wish someone told me before starting Honours"], talking:"Be honest about the academic difficulty jump — less memorisation, more application. Questions don't tell you what method to use. Time pressure is brutal. But here's what actually helps: structured thinking, not more notes.", shoot:"Walking outside or sitting in a coffee shop. Casual, conversational. Talking to a friend, not giving a lecture. Let it breathe.", cta:"Follow for honest CTA and Honours content all year ✦", purpose:'growth', effort:'quick' },
+  { niche:'accounting_study', hooks:["First year accounting students — this will save you so much time","The study system no BCom lecturer actually teaches you","Stop highlighting everything. Do this instead."], talking:"Active vs passive studying for accounting — the trap of re-reading notes vs doing questions under time pressure. Relevant to all accounting levels not just CTA.", shoot:"Standing, talking straight to camera. Energetic, short punchy points. Text overlays reinforce each point. Under 45 seconds.", cta:"Follow for more — posting accounting study tips all year ✦", purpose:'growth', effort:'quick' },
+  { niche:'corporate_life', hooks:["Things nobody tells you before your first corporate job","The unwritten rules of office life they don't teach at university","Year one in corporate — what genuinely surprised me"], talking:"Pick 3 real unwritten rules — reading the room in meetings, how to email senior people, the difference between being busy and being visible. Specific and honest.", shoot:"Walking outside or down a corridor. Talking straight to camera, no cuts. Voice note energy — like you just thought of something and hit record.", cta:"Follow if you're navigating corporate life right now ✦", purpose:'growth', effort:'quick' },
+  { niche:'corporate_life', hooks:["Hot take: your degree didn't actually prepare you for corporate life","The skills that matter in your first job — hint, not the ones you studied","What a 4-year degree doesn't teach you about working with people"], talking:"Emotional intelligence, managing up, reading a brief properly, knowing when to ask vs figure it out. Skills that separate people who progress from those who plateau.", shoot:"Seated, direct to camera, confident energy. Opinion piece — own it. No notes, no script. Short and punchy, under 45 seconds.", cta:"Agree or disagree? Drop it in the comments ✦", purpose:'growth', effort:'quick' },
+  { niche:'corporate_life', hooks:["The salary conversation nobody in corporate wants to have out loud","How to negotiate when you feel like you have zero leverage","What I learnt about asking for money early in my career"], talking:"Mindset shift — you're not asking for a favour, you're negotiating a business arrangement. Know your market rate, time it right, have a number ready.", shoot:"Sitting at a desk, professional but relaxed. Feels like advice from someone slightly ahead of you. Natural light, confident.", cta:"Save this for your next performance review ✦", purpose:'growth', effort:'medium' },
+  { niche:'personal_lifestyle', hooks:["Unpopular opinion: work-life balance is a myth. Here's what to actually chase.","I stopped trying to balance everything — and this happened","The season of life nobody talks about honestly"], talking:"Reframe balance as integration — some seasons are heavy on work, some on life. The goal isn't an equal split, it's knowing which season you're in and owning it without guilt.", shoot:"Walking outside in the evening or on a weekend. Loose, unscripted, genuine. Voice note energy.", cta:"Follow for honest takes on building a career and a life at the same time ✦", purpose:'growth', effort:'quick' },
+  { niche:'personal_lifestyle', hooks:["POV: 23, employed, building a business and writing board exams simultaneously","Nobody prepared me for doing everything at once and I wouldn't change it","The era of doing too much — an honest reflection"], talking:"Honest, specific, relatable. What this season actually feels like — the chaos, the wins, the exhaustion, the excitement. The messiness is what people connect with.", shoot:"Vlog snippets stitched — morning routine, commute, desk, evening. Text overlays tell the story. 30–45 seconds max.", cta:"Follow along — documenting the whole journey this year ✦", purpose:'growth', effort:'quick' },
 ];
 
 const POOL_SOFT = [
-  {
-    niche:'accounting_study',
-    hooks:["One of our students sent this after results came out and I had to share it","This message made my whole week — student passed PGDA","The reason I keep building AccSciHQ — read this"],
-    talking:"Share a real student result (screenshot or read it out). Don't over-explain — let the result speak. Then connect it briefly to what made the difference. The result is the content.",
-    shoot:"Seated, calm, genuine. Hold up your phone showing the message or read it to camera. No graphics needed. Authenticity over production here.",
-    cta:"If you're in CTA or Honours — this is what we do. Link in bio ✦",
-    purpose:'soft', effort:'quick',
-  },
-  {
-    niche:'accounting_study',
-    hooks:["The thing that actually separates students who pass from students who fail","I've tutored enough accounting students to see the pattern clearly","Stop studying more. Start studying like this instead."],
-    talking:"Shift from passive revision to active exam prep — trigger identification, weak topic targeting, timed practice. Mention AccSciHQ naturally as the methodology behind it, not as a hard pitch.",
-    shoot:"Standing, whiteboard or tablet behind you. Feels like a mini masterclass. Write two columns — passive vs active — as you talk. Keep energy high.",
-    cta:"The tracker helps you do this automatically — free trial, link in bio ✦",
-    purpose:'soft', effort:'medium',
-  },
-  {
-    niche:'corporate_life',
-    hooks:["What I'd tell a first year trainee accountant — the honest version","One thing that made the biggest difference in my first year of articles","If I could give one piece of advice to accounting trainees right now"],
-    talking:"Talk about knowing where you stand academically at all times — marks, weak areas, exam dates. Connect naturally to the tracker as the tool you wish existed. Not a pitch — just the problem you were solving.",
-    shoot:"Walking to or from the office, talking to camera. Candid, genuine, slight vulnerability. The commute setting makes it feel completely unplanned.",
-    cta:"AccSciHQ tracker — free 7 days, link in bio ✦",
-    purpose:'soft', effort:'quick',
-  },
-  {
-    niche:'personal_lifestyle',
-    hooks:["The moment I realised I was actually building something real","What 945 students on a list taught me about solving real problems","I started AccSciHQ as a side thing — here's where it actually is now"],
-    talking:"Progress update — the numbers, what's working, what surprised you. Be specific: 945 students, R16k in guides, tracker launching. Specificity makes it credible. Make the audience root for you.",
-    shoot:"Sitting at your desk in the evening, laptop open, lamp light. Reflective tone — like a personal update to people who've been following. Intimate, not polished.",
-    cta:"Link in bio — come see what we're building ✦",
-    purpose:'soft', effort:'medium',
-  },
-  {
-    niche:'accounting_study',
-    hooks:["80% in FAC. Here's what that student did differently.","Our tutor helped a student get into CTA — this is how it happened","Real result from one of our AccSciHQ tutoring students"],
-    talking:"Walk through the specific study approach a successful student used — targeted weak topics, timed practice, confidence tracking. Make it concrete. The method is the message, AccSciHQ is the vehicle.",
-    shoot:"Seated, relaxed, talking like you're recapping a conversation. Hold your phone like you're referencing a message. Keep it personal and conversational.",
-    cta:"Book a tutor at AccSciHQ — link in bio ✦",
-    purpose:'soft', effort:'quick',
-  },
+  { niche:'accounting_study', hooks:["One of our students sent this after results came out and I had to share it","This message made my whole week — student passed PGDA","The reason I keep building AccSciHQ — read this"], talking:"Share a real student result (screenshot or read it out). Don't over-explain — let the result speak. Then connect it briefly to what made the difference. The result is the content.", shoot:"Seated, calm, genuine. Hold up your phone showing the message or read it to camera. No graphics needed. Authenticity over production.", cta:"If you're in CTA or Honours — this is what we do. Link in bio ✦", purpose:'soft', effort:'quick' },
+  { niche:'accounting_study', hooks:["The thing that actually separates students who pass from students who fail","I've tutored enough accounting students to see the pattern clearly","Stop studying more. Start studying like this instead."], talking:"Shift from passive revision to active exam prep — trigger identification, weak topic targeting, timed practice. Mention AccSciHQ naturally as the methodology behind it, not as a hard pitch.", shoot:"Standing, whiteboard or tablet behind you. Feels like a mini masterclass. Write two columns — passive vs active — as you talk.", cta:"The tracker helps you do this automatically — free trial, link in bio ✦", purpose:'soft', effort:'medium' },
+  { niche:'corporate_life', hooks:["What I'd tell a first year trainee accountant — the honest version","One thing that made the biggest difference in my first year of articles","If I could give one piece of advice to accounting trainees right now"], talking:"Talk about knowing where you stand academically at all times — marks, weak areas, exam dates. Connect naturally to the tracker as the tool you wish existed. Not a pitch — just the problem you were solving.", shoot:"Walking to or from the office, talking to camera. Candid, genuine, slight vulnerability. The commute setting makes it feel completely unplanned.", cta:"AccSciHQ tracker — free 7 days, link in bio ✦", purpose:'soft', effort:'quick' },
+  { niche:'personal_lifestyle', hooks:["The moment I realised I was actually building something real","What 945 students on a list taught me about solving real problems","I started AccSciHQ as a side thing — here's where it actually is now"], talking:"Progress update — the numbers, what's working, what surprised you. Be specific: 945 students, R16k in guides, tracker launching. Specificity makes it credible. Make the audience root for you.", shoot:"Sitting at your desk in the evening, laptop open, lamp light. Reflective tone — like a personal update to people who've been following.", cta:"Link in bio — come see what we're building ✦", purpose:'soft', effort:'medium' },
+  { niche:'accounting_study', hooks:["80% in FAC. Here's what that student did differently.","Our tutor helped a student get into CTA — here's how it happened","Real result from one of our AccSciHQ tutoring students"], talking:"Walk through the specific study approach a successful student used — targeted weak topics, timed practice, confidence tracking. Make it concrete. The method is the message, AccSciHQ is the vehicle.", shoot:"Seated, relaxed, talking like you're recapping a conversation. Keep it personal and conversational.", cta:"Book a tutor at AccSciHQ — link in bio ✦", purpose:'soft', effort:'quick' },
 ];
 
-const TRENDING_STATIC = {
+const TRENDING = {
   accounting_study:   ["CTA exam season prep","BCom to Honours transition","SAICA APC qualifying exam","How to survive articles","FAC exam strategies","IFRS 16 explained simply","Management accounting careers","Accounting internship advice","Study smarter not harder","First year accounting struggles"],
   corporate_life:     ["Gen Z in the workplace","Quiet quitting reality check","Big 4 vs boutique firms","Setting boundaries at work","First year corporate lessons","Side hustle while employed","How to get promoted faster","Work from home vs office","Salary transparency movement","Corporate politics is real"],
-  personal_lifestyle: ["Building in public","Quarter life crisis","Honest 20s life content","Morning routines that actually work","Money mindset for young professionals","Imposter syndrome in your first job","Self-improvement without hustle toxicity","Doing too much and loving it"],
+  personal_lifestyle: ["Building in public","Quarter life crisis","Honest 20s life content","Morning routines that work","Money mindset for young professionals","Imposter syndrome in first job","Self-improvement without hustle toxicity","Doing too much and loving it"],
 };
 
 const NICHE_META = {
-  accounting_study:   { label:'Accounting & Study',   emoji:'📊', color:'#F59E0B', bg:'rgba(245,158,11,0.12)' },
-  corporate_life:     { label:'Corporate Life',        emoji:'💼', color:'#60A5FA', bg:'rgba(96,165,250,0.12)' },
-  personal_lifestyle: { label:'Personal & Lifestyle',  emoji:'✨', color:'#C084FC', bg:'rgba(192,132,252,0.12)' },
+  accounting_study:   { label:'Accounting & Study',  emoji:'📊', color:'#F59E0B', bg:'rgba(245,158,11,0.12)' },
+  corporate_life:     { label:'Corporate Life',       emoji:'💼', color:'#60A5FA', bg:'rgba(96,165,250,0.12)' },
+  personal_lifestyle: { label:'Personal & Lifestyle', emoji:'✨', color:'#C084FC', bg:'rgba(192,132,252,0.12)' },
 };
-
 const PURPOSE_META = {
   direct: { label:'AccSciHQ Push',   color:'#F59E0B', bg:'rgba(245,158,11,0.1)',  desc:'Directly promotes the business' },
   growth: { label:'Audience Growth', color:'#60A5FA', bg:'rgba(96,165,250,0.1)',  desc:'Builds reach and new followers' },
   soft:   { label:'Soft Conversion', color:'#34D399', bg:'rgba(52,211,153,0.1)',  desc:'Builds trust, hints at AccSciHQ' },
 };
-
 const EFFORT_META = {
-  quick:  { label:'Quick — 30 min',   icon:'⚡' },
+  quick:  { label:'Quick — 30 min', icon:'⚡' },
   medium: { label:'Medium — 1–2 hrs', icon:'🎬' },
 };
 
-// ─── HELPERS ──────────────────────────────────────────────────────────────────
-function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+const rand = arr => arr[Math.floor(Math.random() * arr.length)];
 
-function platformTip(p) {
-  if (p === 'tiktok') return 'TikTok: hook in 1–2 sec, raw and real, comment bait boosts the algorithm';
-  if (p === 'reels')  return 'Reels: slightly more polished, strong caption, CTA in video AND caption';
-  return 'Both: film once, post natively to each — tweak the caption per platform, don\'t just cross-post';
+function ptip(p) {
+  if (p==='tiktok') return 'TikTok: hook in 1–2 sec, raw and real, comment bait boosts the algorithm';
+  if (p==='reels')  return 'Reels: slightly more polished, strong caption, CTA in video AND caption';
+  return 'Both: film once, post natively to each — tweak caption per platform';
 }
 
-function generateQuick() {
-  const tip = platformTip(platform);
-  return [
-    { ...rand(POOL_ACCSCIHQ), tip },
-    { ...rand(POOL_GROWTH),   tip },
-    { ...rand(POOL_SOFT),     tip },
-  ].map(idea => ({
-    ...idea,
-    selectedHook: rand(idea.hooks),
-    trending: rand(TRENDING_STATIC[idea.niche]),
+function saveToDB() {
+  localStorage.setItem('accscihq_saved', JSON.stringify(savedIdeas));
+  updateCount();
+}
+
+function updateCount() {
+  const el = document.getElementById('saved-count');
+  el.style.display = savedIdeas.length > 0 ? 'inline' : 'none';
+  el.textContent = savedIdeas.length;
+}
+
+function isSaved(idea) { return savedIdeas.some(s => s.hooks[0] === idea.hooks[0]); }
+
+// ── GENERATE ──────────────────────────────────────────────────────────────────
+function genQuick() {
+  const tip = ptip(platform);
+  return [rand(POOL_DIRECT), rand(POOL_GROWTH), rand(POOL_SOFT)].map(idea => ({
+    ...idea, tip, trending: rand(TRENDING[idea.niche]),
   }));
 }
 
-async function generateDeep() {
-  const tip = platformTip(platform);
-  const prompt = `You are a content strategist for AccSciHQ, a South African accounting education brand run by a 23-year-old audit trainee writing APC. The brand has: a marks tracker app (R189/semester, free 7-day trial), CTA topic study guides sold on Payhip, and a tutoring service. The founder posts on TikTok and Instagram Reels across 3 niches: (1) accounting and study content for all accounting students not just CTA, (2) broad corporate life and young professional content not just accounting-specific, (3) personal lifestyle and building in public.
+async function genDeep() {
+  const tip = ptip(platform);
+  const prompt = `You are a content strategist for AccSciHQ, a South African accounting education brand run by a 23-year-old audit trainee writing APC. Products: marks tracker app (R189/semester, 7-day free trial), CTA study guides on Payhip, tutoring service. 945 students on list. Three content niches: (1) accounting and study — all accounting levels not just CTA, (2) corporate life and young professionals — broad not just accounting, (3) personal lifestyle and building in public.
 
-Search for what is genuinely trending RIGHT NOW in: South African accounting student content, young professional and corporate life content on TikTok/Reels, and personal finance or building-in-public lifestyle content.
+Search for what is trending RIGHT NOW in these spaces. Then generate exactly 3 short-form video ideas for TikTok/Reels: one directly pushes AccSciHQ (purpose: direct), one pure audience growth no hard sell (purpose: growth), one soft conversion builds trust (purpose: soft).
 
-Then generate exactly 3 short-form video ideas. One must directly push AccSciHQ (purpose: direct). One must be pure audience growth (purpose: growth). One must softly convert by building trust (purpose: soft).
+Return ONLY a valid JSON array of 3 objects with keys: niche (accounting_study/corporate_life/personal_lifestyle), purpose (direct/growth/soft), hook (under 12 words), hook2, hook3, talking (2-3 sentences specific), shoot (how to film), cta (exact ending), trending (one trending topic RIGHT NOW), effort (quick/medium). Raw JSON only, no markdown.`;
 
-Return ONLY a valid JSON array of 3 objects, each with these exact keys:
-niche (one of: accounting_study, corporate_life, personal_lifestyle),
-purpose (one of: direct, growth, soft),
-hook (punchy opening hook under 12 words),
-hook2 (alternative hook),
-hook3 (another alternative hook),
-talking (2-3 sentences on what to say, specific not generic),
-shoot (how to shoot it — location, setup, energy, duration),
-cta (exact words to end with),
-trending (one specific trending topic or conversation happening RIGHT NOW that this taps into),
-effort (quick or medium).
-
-No markdown. No explanation. Just the raw JSON array.`;
-
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-      messages: [{ role: 'user', content: prompt }],
-    }),
+  const res = await fetch('/api/anthropic', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, tools:[{type:'web_search_20250305',name:'web_search'}], messages:[{role:'user',content:prompt}] }),
   });
-
   const data = await res.json();
-  const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
-  const clean = text.replace(/```json|```/g, '').trim();
-  const parsed = JSON.parse(clean);
-
-  return parsed.map(idea => ({
-    niche:    idea.niche,
-    hooks:    [idea.hook, idea.hook2, idea.hook3].filter(Boolean),
-    talking:  idea.talking,
-    shoot:    idea.shoot,
-    cta:      idea.cta,
-    purpose:  idea.purpose,
-    effort:   idea.effort || 'quick',
-    selectedHook: idea.hook,
-    trending: idea.trending,
-    tip,
-  }));
+  const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+  const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
+  return parsed.map(i=>({ niche:i.niche, hooks:[i.hook,i.hook2,i.hook3].filter(Boolean), talking:i.talking, shoot:i.shoot, cta:i.cta, purpose:i.purpose, effort:i.effort||'quick', trending:i.trending, tip }));
 }
 
-// ─── RENDER ───────────────────────────────────────────────────────────────────
-function renderIdeas(ideas) {
-  const today = new Date().toLocaleDateString('en-ZA', { weekday:'long', day:'numeric', month:'long' });
-  const modeLabel = mode === 'deep' ? 'Deep Research' : 'Quick Mode';
+// ── SCRIPT ────────────────────────────────────────────────────────────────────
+async function buildScript(idea, panel) {
+  panel.innerHTML = `<div class="script-loading">✦ Writing your script and shot list...</div>`;
+  const prompt = `Write a complete short-form video production guide and script for AccSciHQ's founder — a 23-year-old South African audit trainee writing APC who runs AccSciHQ (945 students, R16k in guide sales, marks tracker at R189/semester, CTA guides on Payhip, tutoring service).
 
-  const out = document.getElementById('output');
-  out.innerHTML = `
-    <div class="divider" id="divider">
-      <div class="divider-line"></div>
-      <div class="divider-text">${today} · ${modeLabel}</div>
-      <div class="divider-line"></div>
-    </div>
-    ${ideas.map((idea, i) => renderCard(idea, i)).join('')}
-    <p class="footer-note" id="footer-note">Done beats perfect. Pick one and press record. ✦</p>
-  `;
+VIDEO DETAILS:
+Hook: ${idea.hooks[0]}
+Niche: ${idea.niche}
+Purpose: ${idea.purpose}
+What to cover: ${idea.talking}
+Shoot style: ${idea.shoot}
+End CTA: ${idea.cta}
+Platform: ${platform}
 
-  // Animate in
-  requestAnimationFrame(() => {
-    document.getElementById('divider')?.classList.add('show');
-    document.querySelectorAll('.idea-card').forEach((card, i) => {
-      setTimeout(() => card.classList.add('visible'), i * 180 + 80);
+Return a JSON object with:
+- shoot_breakdown: array of 4-6 objects each with "shot" (e.g. "Shot 1 — 0:00–0:03") and "description" (exactly what to film and say)
+- script: full word-for-word script in the founder's voice — casual, confident, South African young professional. Include [VISUAL CUE] notes in brackets. Should sound natural, not corporate.
+- duration: suggested total duration (e.g. "45–60 seconds")
+- caption: suggested posting caption with relevant South African accounting and corporate hashtags
+
+Raw JSON only, no markdown.`;
+
+  try {
+    const res = await fetch('/api/anthropic', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, messages:[{role:'user',content:prompt}] }),
     });
-    setTimeout(() => {
-      document.getElementById('footer-note')?.classList.add('show');
-    }, 700);
-  });
-
-  // Hook tab interactivity
-  document.querySelectorAll('.hook-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      const card = tab.closest('.idea-card');
-      const idx  = parseInt(tab.dataset.idx);
-      card.querySelectorAll('.hook-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      card.querySelector('.hook-text').textContent = `"${ideas[parseInt(tab.dataset.card)].hooks[idx]}"`;
-    });
-  });
+    const data = await res.json();
+    const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+    const p = JSON.parse(text.replace(/```json|```/g,'').trim());
+    const shots = (p.shoot_breakdown||[]).map(s=>`<li class="shot-item"><span class="shot-num">${s.shot}</span><span class="shot-text">${s.description}</span></li>`).join('');
+    panel.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+        <span style="color:#60A5FA;font-size:14px;font-weight:700;">🎬 Full Production Guide</span>
+        <span style="background:rgba(96,165,250,0.15);color:#60A5FA;font-size:11px;font-family:'DM Mono',monospace;padding:3px 10px;border-radius:6px;">${p.duration||''}</span>
+      </div>
+      <div class="script-section"><div class="script-section-title">📋 Shot Breakdown</div><ul class="shot-list">${shots}</ul></div>
+      <div class="script-section"><div class="script-section-title">🎙 Word-for-Word Script</div><div class="script-content">${p.script||''}</div></div>
+      <div class="script-section"><div class="script-section-title">📱 Suggested Caption</div><div class="script-content">${p.caption||''}</div></div>
+    `;
+  } catch(e) {
+    panel.innerHTML = `<div style="color:#F87171;padding:14px;font-size:13px;">Couldn't generate script. Check your connection and try again.</div>`;
+  }
 }
 
-function renderCard(idea, cardIdx) {
-  const niche   = NICHE_META[idea.niche]    || NICHE_META.personal_lifestyle;
-  const purpose = PURPOSE_META[idea.purpose] || PURPOSE_META.growth;
-  const effort  = EFFORT_META[idea.effort]   || EFFORT_META.quick;
+// ── RENDER CARD ───────────────────────────────────────────────────────────────
+function renderCard(idea, idx, fromSaved) {
+  const n = NICHE_META[idea.niche]    || NICHE_META.personal_lifestyle;
+  const p = PURPOSE_META[idea.purpose] || PURPOSE_META.growth;
+  const e = EFFORT_META[idea.effort]   || EFFORT_META.quick;
+  const sid = isSaved(idea);
+  const pfx = fromSaved ? 's' : 'g';
 
-  const hookTabs = idea.hooks.map((h, i) =>
-    `<button class="hook-tab ${i===0?'active':''}" data-card="${cardIdx}" data-idx="${i}">Hook ${i+1}</button>`
+  const tabs = (idea.hooks||[]).map((h,i)=>
+    `<button class="hook-tab ${i===0?'active':''}" data-ci="${idx}" data-hi="${i}" data-fs="${fromSaved}">${['Hook 1','Hook 2','Hook 3'][i]||'Hook '+(i+1)}</button>`
   ).join('');
 
   return `
-  <div class="idea-card" style="--niche-color:${niche.color}">
-    <div style="position:absolute;top:0;right:0;width:160px;height:160px;background:radial-gradient(circle at top right,${niche.color}18,transparent 65%);pointer-events:none;"></div>
-
-    <div class="badges">
-      <span class="badge" style="color:${niche.color};background:${niche.bg};border-color:${niche.color}30">${niche.emoji} ${niche.label}</span>
-      <span class="badge" style="color:${purpose.color};background:${purpose.bg};border-color:${purpose.color}30">${purpose.label}</span>
-      <span class="badge" style="color:#64748B;background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08)">${effort.icon} ${effort.label}</span>
+  <div class="idea-card" id="card-${pfx}-${idx}">
+    <div class="card-glow" style="background:radial-gradient(circle at top right,${n.color}18,transparent 65%)"></div>
+    <div class="card-header">
+      <div class="badges">
+        <span class="badge" style="color:${n.color};background:${n.bg};border-color:${n.color}30">${n.emoji} ${n.label}</span>
+        <span class="badge" style="color:${p.color};background:${p.bg};border-color:${p.color}30">${p.label}</span>
+        <span class="badge" style="color:#64748B;background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08)">${e.icon} ${e.label}</span>
+      </div>
+      <div class="card-actions">
+        <button class="action-btn save-btn ${sid?'saved':''}" data-ci="${idx}" data-fs="${fromSaved}">${sid?'♥ Saved':'♡ Save'}</button>
+        <button class="action-btn expand-btn" data-ci="${idx}" data-fs="${fromSaved}">🎬 Script</button>
+      </div>
     </div>
-
-    <div class="purpose-desc">Purpose: ${purpose.desc}</div>
-
+    <div class="purpose-desc">Purpose: ${p.desc}</div>
     <div class="sec-label">🎣 Hook</div>
     <div class="hook-box">
-      <div class="hook-text">"${idea.hooks[0]}"</div>
-      <div class="hook-tabs">${hookTabs}</div>
+      <div class="hook-text" id="hook-text-${pfx}-${idx}">"${(idea.hooks||[])[0]||''}"</div>
+      <div class="hook-tabs">${tabs}</div>
     </div>
-
     <div class="two-col">
-      <div>
-        <div class="sec-label">💬 What to cover</div>
-        <div class="info-box">${idea.talking}</div>
-      </div>
-      <div>
-        <div class="sec-label">🎥 How to shoot it</div>
-        <div class="info-box">${idea.shoot}</div>
-      </div>
+      <div><div class="sec-label">💬 What to cover</div><div class="info-box">${idea.talking}</div></div>
+      <div><div class="sec-label">🎥 How to shoot it</div><div class="info-box">${idea.shoot}</div></div>
     </div>
-
     <div class="trending-row">
       <span class="trending-label">🔍 TRENDING ANGLE</span>
-      <span class="trending-value">${idea.trending}</span>
+      <span class="trending-value">${idea.trending||'—'}</span>
     </div>
-
-    <div class="platform-row">
-      <span class="platform-label">📱 PLATFORM</span>
-      <span class="platform-value">${idea.tip}</span>
-    </div>
-
+    ${idea.tip?`<div class="platform-row"><span class="platform-label">📱 PLATFORM</span><span class="platform-value">${idea.tip}</span></div>`:''}
     <div class="cta-row">
       <span class="cta-label">END WITH</span>
       <span class="cta-value">"${idea.cta}"</span>
     </div>
+    <div class="script-panel" id="sp-${pfx}-${idx}"></div>
   </div>`;
 }
 
-// ─── CONTROLS ─────────────────────────────────────────────────────────────────
-document.querySelectorAll('[data-group="platform"]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    platform = btn.dataset.val;
-    document.querySelectorAll('[data-group="platform"]').forEach(b => b.classList.remove('active-gold'));
+function attachListeners(ideas, fromSaved) {
+  const pfx = fromSaved ? 's' : 'g';
+
+  // Hook tabs
+  document.querySelectorAll(`.hook-tab[data-fs="${fromSaved}"]`).forEach(tab => {
+    tab.addEventListener('click', () => {
+      const ci = +tab.dataset.ci, hi = +tab.dataset.hi;
+      const card = tab.closest('.idea-card');
+      card.querySelectorAll('.hook-tab').forEach(t=>t.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(`hook-text-${pfx}-${ci}`).textContent = `"${ideas[ci].hooks[hi]}"`;
+    });
+  });
+
+  // Save
+  document.querySelectorAll(`.save-btn[data-fs="${fromSaved}"]`).forEach(btn => {
+    btn.addEventListener('click', () => {
+      const ci = +btn.dataset.ci;
+      const idea = ideas[ci];
+      if (isSaved(idea)) {
+        savedIdeas = savedIdeas.filter(s=>s.hooks[0]!==idea.hooks[0]);
+        btn.textContent='♡ Save'; btn.classList.remove('saved');
+      } else {
+        savedIdeas.push({...idea, savedAt:Date.now()});
+        btn.textContent='♥ Saved'; btn.classList.add('saved');
+      }
+      // Sync save buttons across both panels
+      document.querySelectorAll(`.save-btn`).forEach(b => {
+        const bci = +b.dataset.ci;
+        const bfs = b.dataset.fs === 'true';
+        const pool = bfs ? savedIdeas : currentIdeas;
+        if (pool[bci] && pool[bci].hooks[0] === idea.hooks[0]) {
+          const saved = isSaved(idea);
+          b.textContent = saved ? '♥ Saved' : '♡ Save';
+          saved ? b.classList.add('saved') : b.classList.remove('saved');
+        }
+      });
+      saveToDB();
+    });
+  });
+
+  // Script
+  document.querySelectorAll(`.expand-btn[data-fs="${fromSaved}"]`).forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const ci = +btn.dataset.ci;
+      const idea = ideas[ci];
+      const panel = document.getElementById(`sp-${pfx}-${ci}`);
+      if (panel.classList.contains('open')) {
+        panel.classList.remove('open');
+        btn.textContent='🎬 Script'; btn.classList.remove('open');
+        return;
+      }
+      panel.classList.add('open');
+      btn.textContent='✕ Close'; btn.classList.add('open');
+      await buildScript(idea, panel);
+    });
+  });
+}
+
+// ── RENDER IDEAS ──────────────────────────────────────────────────────────────
+function renderIdeas(ideas) {
+  currentIdeas = ideas;
+  const today = new Date().toLocaleDateString('en-ZA',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('output').innerHTML = `
+    <div class="divider" id="div-main"><div class="divider-line"></div><div class="divider-text">${today} · ${mode==='deep'?'Deep Research':'Quick Mode'}</div><div class="divider-line"></div></div>
+    ${ideas.map((idea,i)=>renderCard(idea,i,false)).join('')}
+    <p class="footer-note" id="fn">Done beats perfect. Pick one and press record. ✦</p>
+  `;
+  requestAnimationFrame(()=>{
+    document.getElementById('div-main')?.classList.add('show');
+    document.querySelectorAll('#page-generate .idea-card').forEach((c,i)=>setTimeout(()=>c.classList.add('visible'),i*180+80));
+    setTimeout(()=>document.getElementById('fn')?.classList.add('show'),700);
+  });
+  attachListeners(ideas, false);
+}
+
+// ── SAVED PAGE ────────────────────────────────────────────────────────────────
+function renderSaved() {
+  const out = document.getElementById('saved-output');
+  if (!savedIdeas.length) {
+    out.innerHTML=`<div class="empty-state"><div class="empty-icon">♡</div><div class="empty-title">No saved ideas yet</div><div class="empty-sub">Generate some ideas and hit Save on the ones you like.<br>They'll live here ready when you are.</div></div>`;
+    return;
+  }
+  out.innerHTML = savedIdeas.map((idea,i)=>renderCard(idea,i,true)).join('');
+  document.querySelectorAll('#page-saved .idea-card').forEach(c=>{c.style.opacity=1;c.style.transform='translateY(0)';});
+  attachListeners(savedIdeas, true);
+}
+
+// ── TAB SWITCH ────────────────────────────────────────────────────────────────
+function switchTab(tab, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+tab).classList.add('active');
+  el.classList.add('active');
+  if (tab==='saved') renderSaved();
+}
+
+// ── CONTROLS ──────────────────────────────────────────────────────────────────
+document.querySelectorAll('[data-group="platform"]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    platform=btn.dataset.val;
+    document.querySelectorAll('[data-group="platform"]').forEach(b=>b.classList.remove('active-gold'));
     btn.classList.add('active-gold');
   });
 });
-
-document.querySelectorAll('[data-group="mode"]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    mode = btn.dataset.val;
-    document.querySelectorAll('[data-group="mode"]').forEach(b => b.classList.remove('active-blue'));
+document.querySelectorAll('[data-group="mode"]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    mode=btn.dataset.val;
+    document.querySelectorAll('[data-group="mode"]').forEach(b=>b.classList.remove('active-blue'));
     btn.classList.add('active-blue');
   });
 });
 
-// ─── LOADING MESSAGES ─────────────────────────────────────────────────────────
-const LOAD_STEPS = [
-  "Searching what's trending in accounting content...",
-  "Scanning corporate & young professional spaces...",
-  "Checking lifestyle and building-in-public trends...",
-  "Crafting your 3 ideas with the right ratio...",
-];
-let loadInterval = null;
+// ── LOADING ───────────────────────────────────────────────────────────────────
+const STEPS=['Searching what\'s trending in accounting content...','Scanning corporate & young professional spaces...','Checking lifestyle and building-in-public trends...','Crafting your 3 ideas with the right ratio...'];
+let loadIv=null;
 
-function startLoading() {
-  const btn = document.getElementById('gen-btn');
-  btn.disabled = true;
-  document.getElementById('error-box').style.display = 'none';
-  document.getElementById('output').innerHTML = '';
-
-  if (mode === 'deep') {
-    let step = 0;
-    btn.textContent = `🔍 ${LOAD_STEPS[0]}`;
-    loadInterval = setInterval(() => {
-      step = (step + 1) % LOAD_STEPS.length;
-      btn.textContent = `🔍 ${LOAD_STEPS[step]}`;
-    }, 2200);
-  } else {
-    btn.textContent = '⟳  Generating...';
-  }
+function startLoad(){
+  const btn=document.getElementById('gen-btn');
+  btn.disabled=true;
+  document.getElementById('error-box').style.display='none';
+  document.getElementById('output').innerHTML='';
+  if(mode==='deep'){
+    let s=0; btn.textContent=`🔍 ${STEPS[0]}`;
+    loadIv=setInterval(()=>{s=(s+1)%STEPS.length;btn.textContent=`🔍 ${STEPS[s]}`;},2200);
+  } else { btn.textContent='⟳ Generating...'; }
 }
 
-function stopLoading(hasIdeas) {
-  clearInterval(loadInterval);
-  const btn = document.getElementById('gen-btn');
-  btn.disabled = false;
-  btn.textContent = hasIdeas ? '⟳  Fresh batch' : '✦  Generate my 3 ideas';
+function stopLoad(ok){
+  clearInterval(loadIv);
+  const btn=document.getElementById('gen-btn');
+  btn.disabled=false;
+  btn.textContent=ok?'⟳  Fresh batch':'✦  Generate my 3 ideas';
 }
 
-// ─── GENERATE ─────────────────────────────────────────────────────────────────
-document.getElementById('gen-btn').addEventListener('click', async () => {
-  startLoading();
+// ── MAIN ──────────────────────────────────────────────────────────────────────
+document.getElementById('gen-btn').addEventListener('click', async()=>{
+  startLoad();
   try {
-    const ideas = mode === 'deep' ? await generateDeep() : generateQuick();
+    const ideas = mode==='deep' ? await genDeep() : genQuick();
     renderIdeas(ideas);
-    stopLoading(true);
+    stopLoad(true);
   } catch(e) {
     console.error(e);
-    const eb = document.getElementById('error-box');
-    eb.textContent = 'Something went wrong in Deep Research mode. Try Quick mode or check your connection.';
-    eb.style.display = 'block';
-    stopLoading(false);
+    const eb=document.getElementById('error-box');
+    eb.textContent=mode==='deep'
+      ?'Deep Research failed. The Netlify function may still be deploying — try Quick mode or wait a minute.'
+      :'Something went wrong. Please refresh and try again.';
+    eb.style.display='block';
+    stopLoad(false);
   }
 });
+
+updateCount();
 </script>
 </body>
 </html>
