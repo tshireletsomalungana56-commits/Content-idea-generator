@@ -237,7 +237,7 @@
           </button>
           <button class="mode-btn" data-group="mode" data-val="deep">
             <div class="mode-title">🔍 Deep Research</div>
-            <div class="mode-sub">Live trends — 10–15 sec</div>
+            <div class="mode-sub">AI-powered trends</div>
           </button>
         </div>
       </div>
@@ -347,14 +347,16 @@ function genQuick() {
 
 async function genDeep() {
   const tip = ptip(platform);
-  const prompt = `AccSciHQ: SA accounting education brand, 23yo audit trainee founder, APC 2026. Products: marks tracker (R189/sem), CTA guides on Payhip, tutoring. 945 students. Niches: (1) accounting/study, (2) corporate life/young professionals, (3) personal lifestyle/building in public.
+  const prompt = `AccSciHQ: SA accounting education, 23yo audit trainee founder writing APC 2026. Products: marks tracker (R189/sem, 7-day trial), CTA guides on Payhip, tutoring. 945 students. Niches: (1) accounting/study all levels, (2) corporate life/young professionals, (3) personal lifestyle/building in public.
 
-Search trending topics NOW in these niches. Generate 3 short-form video ideas: one promotes AccSciHQ directly (direct), one pure growth no sell (growth), one soft trust-building (soft).
+Generate 3 fresh short-form video ideas with current trending angles. One promotes AccSciHQ directly (direct), one pure audience growth (growth), one soft trust-building (soft).
 
-Return ONLY a JSON array of 3 objects: {niche, purpose, hook, hook2, hook3, talking, shoot, cta, trending, effort}. Raw JSON only.`;
+Return ONLY a JSON array of 3 objects: {niche, purpose, hook, hook2, hook3, talking, shoot, cta, trending, effort}. Raw JSON only, no markdown.`;
+
   const res = await fetch('/.netlify/functions/anthropic', {
     method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, messages:[{role:'user',content:prompt}] }),
+  });
   const data = await res.json();
   const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
   const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
@@ -364,7 +366,7 @@ Return ONLY a JSON array of 3 objects: {niche, purpose, hook, hook2, hook3, talk
 // ── SCRIPT ────────────────────────────────────────────────────────────────────
 async function buildScript(idea, panel) {
   panel.innerHTML = `<div class="script-loading">✦ Writing your script and shot list...</div>`;
-  const prompt = `Write a TikTok/Reels production guide for AccSciHQ's founder (23yo SA audit trainee, APC 2026, 945 students, marks tracker R189/sem).
+  const prompt = `Short-form video script for AccSciHQ founder (23yo SA audit trainee, APC 2026, 945 students, marks tracker R189/sem).
 
 Hook: ${idea.hooks[0]}
 Cover: ${idea.talking}
@@ -372,7 +374,9 @@ Shoot: ${idea.shoot}
 CTA: ${idea.cta}
 Platform: ${platform}
 
-Return JSON: {shoot_breakdown: [{shot, description}], script, duration, caption}. Casual SA voice, natural not corporate. Raw JSON only.`;  try {
+Return JSON: {shoot_breakdown:[{shot,description}], script, duration, caption}. Casual confident SA voice, natural not corporate. Raw JSON only.`;
+
+  try {
     const res = await fetch('/.netlify/functions/anthropic', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, messages:[{role:'user',content:prompt}] }),
