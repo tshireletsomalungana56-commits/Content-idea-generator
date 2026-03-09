@@ -1,5 +1,4 @@
 exports.handler = async function(event, context) {
-  // Only allow POST
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
@@ -12,18 +11,20 @@ exports.handler = async function(event, context) {
   try {
     const body = JSON.parse(event.body);
 
+    // Remove tools if using web_search to test basic connectivity first
+    const payload = { ...body };
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'web-search-2025-03-05',
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(payload),
     });
 
-    const data = await response.json();
+    const text = await response.text();
 
     return {
       statusCode: 200,
@@ -31,11 +32,12 @@ exports.handler = async function(event, context) {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
       },
-      body: JSON.stringify(data),
+      body: text,
     };
   } catch (err) {
     return {
       statusCode: 500,
+      headers: { 'Access-Control-Allow-Origin': '*' },
       body: JSON.stringify({ error: err.message }),
     };
   }
