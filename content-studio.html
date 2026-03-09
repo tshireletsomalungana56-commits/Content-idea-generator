@@ -354,8 +354,7 @@ Search trending topics NOW in these niches. Generate 3 short-form video ideas: o
 Return ONLY a JSON array of 3 objects: {niche, purpose, hook, hook2, hook3, talking, shoot, cta, trending, effort}. Raw JSON only.`;
   const res = await fetch('/.netlify/functions/anthropic', {
     method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, tools:[{type:'web_search_20250305',name:'web_search'}], messages:[{role:'user',content:prompt}] }),
-  });
+    body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, messages:[{role:'user',content:prompt}] }),
   const data = await res.json();
   const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
   const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
